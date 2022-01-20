@@ -8,14 +8,23 @@ up = '\033[A'
 
 class wipe:
     width, height = shutil.get_terminal_size()
-    print("height:", height, "width:", width)
+    instance = None #instance so __del__ is called at end
     def screen(): return os.system('cls' if os.name == 'nt' else 'clear')
 
     def cursor(height=None):
+        if wipe.instance is None:
+            wipe.screen()
+            wipe.instance = wipe()
+        wipe.instance.to_top_left(height)
+
+    def to_top_left(self, height=None):
         print('\b'*wipe.width, end="")
         if height is None:
             height = wipe.height
         print(up*height, end="")
+
+    def __del__(self):
+        wipe.screen()
 
 
 if __name__ == "__main__":
