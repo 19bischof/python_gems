@@ -4,17 +4,20 @@ import prettytable
 import pathlib
 
 
-class sqlite3_functions:
-
+class quick_lite3:
+    """Simple functions to quickstart your sqlite3 database.
+    Extensible with custom_query() or inheriting this class and 
+    implementing your own functions. 
+    Important: If you do, decorate the function with '@quick_lite3.mng_conn' !"""
     no_out = False
 
     def __init__(self, file_name="my_db.db"):
         self.file_path = pathlib.Path(
             __file__).parent.as_posix() + "/" + file_name
 
-    @staticmethod
+    
     def mng_conn(bosom):
-        """connection context manager"""
+        """Decorater - connection context manager"""
 
         def ample(self, *args):
             with sqlite3.Connection(self.file_path) as conn:
@@ -118,7 +121,7 @@ class sqlite3_functions:
 
 if __name__ == "__main__":
     # example usage
-    db = sqlite3_functions()
+    db = quick_lite3()
     db.no_out = False
     db.create_table("table2",("test text",))
     db.drop("table2")
@@ -133,3 +136,10 @@ if __name__ == "__main__":
     db.select_some("table1",("name",))
     db.update("table1",'name = "hammer"',"name = 'hubert'")
     db.select_all("table1")
+    class test(quick_lite3):
+        @quick_lite3.mng_conn
+        def test(self):
+            query = """SELECT sqlite_version();"""
+            self.cursor.execute(query)
+    t = test()
+    t.test()
