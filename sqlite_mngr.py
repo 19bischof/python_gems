@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Iterable, Any
+from typing import Iterable, Any, List, Tuple
 import prettytable
 import pathlib
 
@@ -8,26 +8,40 @@ class quick_lite3:
     """Simple functions to quickstart your sqlite3 database.
     Extensible with custom_query() or inheriting this class and 
     implementing your own functions. 
-    Important: If you do, decorate the function with '@quick_lite3.mng_conn' !"""
-    no_out = False
+    Important: If you do, decorate your functions with '@quick_lite3.mng_conn' !"""
+    print_output = True
 
     def __init__(self, file_name="my_db.db"):
         self.file_path = pathlib.Path(
             __file__).parent.as_posix() + "/" + file_name
+        self.conn = sqlite3.Connection(self.file_path)
 
-    
-    def mng_conn(bosom):
-        """Decorater - connection context manager"""
+    def mng_conn(bosom) -> List[Tuple]|None:
+        """Decorater - Manages Transactions and prints output if self.print_output
+        :return: The cursor data
+        """
 
         def ample(self, *args):
-            with sqlite3.Connection(self.file_path) as conn:
-                self.cursor = conn.cursor()
+            with self.conn:
+                self.cursor = self.conn.cursor()
                 bosom(self, *args)
-                if self.no_out:
-                    return
-                if table_s := prettytable.from_db_cursor(self.cursor):
+            curs_like = self.pseudo_cursor()
+            if self.print_output:
+                if table_s := prettytable.from_db_cursor(curs_like):
                     print(table_s)
+            return curs_like.body
         return ample
+
+    def pseudo_cursor(self):
+        """Create Cursor-like Object for prettytable"""
+        class _:
+            def __init__(soul):
+                soul.body = self.cursor.fetchall()
+                soul.description = self.cursor.description
+
+            def fetchall(soul):
+                return soul.body
+        return _()
 
     def scrub(self, s):
         """prevents sql-injection when parametrizing tablenames"""
@@ -122,20 +136,21 @@ class quick_lite3:
 if __name__ == "__main__":
     # example usage
     db = quick_lite3()
-    db.no_out = False
-    db.create_table("table2",("test text",))
+    db.print_output = True
+    db.create_table("table2", ("test text",))
     db.drop("table2")
     db.drop("table1")
-    db.create_table("table1",("name text","age int"))
+    db.create_table("table1", ("name text", "age int"))
     db.print_tables()
     db.print_sqlite_version()
     db.describe("table1")
     db.select_all("table1")
-    db.insert("table1",("herald",132))
-    db.insert("table1",("hubert",120))
-    db.select_some("table1",("name",))
-    db.update("table1",'name = "hammer"',"name = 'hubert'")
+    db.insert("table1", ("herald", 132))
+    db.insert("table1", ("hubert", 120))
+    db.select_some("table1", ("name",))
+    db.update("table1", 'name = "hammer"', "name = 'hubert'")
     db.select_all("table1")
+
     class test(quick_lite3):
         @quick_lite3.mng_conn
         def test(self):
