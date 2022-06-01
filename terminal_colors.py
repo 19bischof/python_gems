@@ -35,6 +35,7 @@ class clr:
               "BrightWhite": BrightWhite}
 
 def choose_color():
+    """utility to give example colors and let user choose if they like it"""
     while 1:
         res = input("Background unchanged(u),black(b) or grey(g)?")
         if res.lower().strip() in ("u","g","b"):
