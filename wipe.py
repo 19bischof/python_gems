@@ -7,21 +7,30 @@ up = '\033[A'
 
 
 class wipe:
+    """
+    utility that cleans the console screen efficiently
+    Call with wipe.cursor()
+    """
     width, height = shutil.get_terminal_size()
     instance = None #instance so __del__ is called at end
     def screen(): return os.system('cls' if os.name == 'nt' else 'clear')
 
-    def cursor(height=None):
+    def cursor(height=None,no_traces=False):
+        """entry point to use as a module"""
         if wipe.instance is None:
             wipe.screen()
             wipe.instance = wipe()
-        wipe.instance.to_top_left(height)
+        if height is None: height = wipe.height
+        wipe.instance.to_top_left(height,no_traces)
 
-    def to_top_left(self, height=None):
-        print('\b'*wipe.width, end="")
-        if height is None:
-            height = wipe.height
-        print(up*height, end="")
+    def to_top_left(self, height,no_traces):
+        """cleans the console through overwriting with spaces"""
+        for _ in range(height):
+            print('\b'*wipe.width, end="")
+            if no_traces:
+                print(" "*(wipe.width),end="")
+            print(up, end="")
+        print('\b'*wipe.width,flush=True,end="")
 
     def __del__(self):
         wipe.screen()
@@ -29,12 +38,10 @@ class wipe:
 
 if __name__ == "__main__":
     import time
-    import lorem
-    wipe.screen()
+    import lorem #install with pip if not already
     row_count = 5
     for j in range(5):
         for i in range(row_count):
             print(lorem.sentence())
             time.sleep(0.31)
-        wipe.cursor(row_count)
-    wipe.screen()
+        wipe.cursor(row_count,no_traces=True)
