@@ -35,9 +35,23 @@ class _GetchWindows:
         import msvcrt
         return msvcrt.getch()
 
+def get_input(request):
+    print(request)
+    _getch = Getch() #init 
+    inputs = []
+    while(inp:=_getch()): #get character
+        inp = inp.decode()
+        print(inp,end="",flush=True)
+        if inp == "\x03": #Ctrl+c
+            raise KeyboardInterrupt
+        if inp == '\r':
+            break
+        inputs.append(inp)
+    return "".join(inputs)
+
 if __name__ == "__main__":
     _getch = Getch() #init 
     while(inp:=_getch()): #get character
         if inp == b"\x03": #Ctrl+c
-            quit()
+            raise KeyboardInterrupt
         print(inp)
